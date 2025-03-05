@@ -72,7 +72,7 @@ const Sidebar = () => {
                     <li>
                         <button 
                             className="w-full flex items-center gap-3 text-left text-red-400 hover:bg-gray-700 p-2 rounded" 
-                            onClick={() => window.location.href = 'http://localhost:5174'}
+                            onClick={() => window.location.href = 'https://luxeusefurnish.netlify.app/'}
                         >
                             <LogOut size={20} />
                             Logout
