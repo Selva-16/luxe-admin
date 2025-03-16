@@ -41,7 +41,7 @@ const Dashboard = () => {
                     <div key={index} className="bg-gray-200 shadow-md rounded-lg p-6 flex items-center justify-between">
                         <div>
                             <h3 className="text-xl font-semibold">{label}</h3>
-                            <p className="text-2xl font-bold">{typeof value === 'number' ? `₹ ${value.toLocaleString()}` : value}</p>
+                            <p className="text-2xl font-bold">{typeof value === 'number' ? `${value.toLocaleString()}` : value}</p>
                         </div>
                         <Icon className="w-10 h-10 text-gray-500" />
                     </div>
