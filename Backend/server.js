@@ -1,5 +1,4 @@
 import express from 'express';
-// import mongoose from 'mongoose';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -13,10 +12,10 @@ dotenv.config(); // Load environment variables
 const app = express();
 app.use(express.json({ limit: "50mb" })); // Increase limit for base64 images
 
-// ✅ CORS Configuration (Allow Frontend Requests)
+// ✅ CORS Configuration (Allow Frontend Requests from .env)
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174'];
+  : [process.env.BASE_URL || 'http://localhost:3000'];  // Default to BASE_URL
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -45,7 +44,6 @@ mongoose.connect(mongoURI)
     process.exit(1);
   });
 
-
 // Storage settings (Uploads to 'uploads/' folder)
 const storage = multer.diskStorage({
   destination: "./uploads",
@@ -67,23 +65,12 @@ app.post("/api/upload", upload.single("image"), (req, res) => {
   res.json({ imageUrl: `/uploads/${req.file.filename}` }); // Return image URL
 });
 
-
-
 // ✅ User Schema & Model
 const userSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true },
   password: String, // Hashed password
   loginDate: { type: Date, default: Date.now },
-});
-
-// Product Schema & Model
-const ProductSchema = new Schema({
-  name: String,
-  category: String,
-  price: Number,
-  stock: Number,
-  image: String,
 });
 
 const User = mongoose.model('User', userSchema);
@@ -93,6 +80,7 @@ app.get('/', (req, res) => {
   res.send('🚀 Server is Running!');
 });
 
+// ✅ Signup Route
 app.post('/api/signup', async (req, res) => {
   console.log('📥 Received sign-up request:', req.body); // Debug log
 
@@ -167,21 +155,18 @@ app.post('/api/signin', async (req, res) => {
   }
 });
 
-// Fetch all products
-app.get('/products', async (req, res) => {
-  try {
-    const products = await Product.find();
-    res.json(products);
-  } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ message: 'Server Error' });
-  }
+// ✅ Product Schema & Model
+const ProductSchema = new Schema({
+  name: String,
+  category: String,
+  price: Number,
+  stock: Number,
+  image: String,
 });
-
 
 const Product = model("Product", ProductSchema);
 
-// Routes
+// ✅ Product Routes
 
 // Get all products
 app.get("/api/products", async (req, res) => {
@@ -204,41 +189,7 @@ app.post("/api/products", async (req, res) => {
   }
 });
 
-// Fetch User 
-app.get("/api/users", async (req, res) => {
-  try {
-      const users = await User.find().select("-password"); // Exclude password
-      res.json(users);
-  } catch (error) {
-      res.status(500).json({ error: "Failed to fetch users" });
-  }
-});
-
-// Fetch Single User by ID
-app.get("/api/users/:id", async (req, res) => {
-  try {
-      const user = await User.findById(req.params.id).select("-password");
-      if (!user) return res.status(404).json({ error: "User not found" });
-      res.json(user);
-  } catch (error) {
-      res.status(500).json({ error: "Failed to fetch user" });
-  }
-});
-
-// Delete a user by ID
-app.delete("/api/users/:id", async (req, res) => {
-  try {
-      const user = await User.findByIdAndDelete(req.params.id);
-      if (!user) {
-          return res.status(404).json({ message: "User not found" });
-      }
-      res.json({ message: "User deleted successfully" });
-  } catch (error) {
-      res.status(500).json({ message: "Error deleting user", error });
-  }
-});
-
-// Delete Products from Admin
+// Delete a product
 app.delete("/api/products/:id", async (req, res) => {
   try {
       const productId = req.params.id;
@@ -254,7 +205,6 @@ app.delete("/api/products/:id", async (req, res) => {
   }
 });
 
-
 // Update a Product
 app.put("/api/products/:id", async (req, res) => {
   try {
@@ -268,4 +218,5 @@ app.put("/api/products/:id", async (req, res) => {
 
 // ✅ Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+app.listen(PORT, () => console.log(`🚀 Server running on ${BASE_URL}`));
