@@ -15,8 +15,7 @@ const PORT = process.env.PORT || 5000;
 // ✅ Define allowed origins (Make sure this matches your frontend)
 const allowedOrigins = [
   "http://localhost:5173",
-  "http://localhost:3000",
-  "https://luxe-admin.vercel.app"
+  "http://localhost:3000"
 ];
 
 // ✅ Configure CORS
